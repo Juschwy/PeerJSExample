@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>PeerJS Example</title>
+    </head>
+    <body>
+        <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+        <p>
+            <span id="myPeerId">My peer ID: pending...</span>
+            <button id="copyBtn" disabled>Copy</button></p>
+        <p>
+            <label for="peerId">Connect to ID:</label>
+            <input id="peerId" type="text">
+            <button id="connectPeerIdBtn">Connect to ID</button>
+        </p>
+        <p>
+            <label for="msg">Message:</label>
+            <input disabled id="msg" type="text">
+            <button disabled id="sendMsgBtn">Send Message</button>
+        </p>
+        <output id="output">
+
+        </output>
+        <script>
+            let peer = new Peer();
+            const myPeerId = document.getElementById("myPeerId")
+            const copyBtn = document.getElementById("copyBtn")
+            const peerIdInput = document.getElementById("peerId")
+            const connectPeerId = document.getElementById("connectPeerIdBtn")
+            const msgInput = document.getElementById("msg")
+            const sendMsg = document.getElementById("sendMsgBtn")
+            const output = document.getElementById("output")
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const connectTo = urlParams.get('connectTo');
+
+            function addOutput(msg, inc){
+                let para = document.createElement("p")
+                para.innerText = (inc ? ">" : "<") + " " + msg
+                output.appendChild(para)
+            }
+
+            function onConnection (conn){
+                conn.on('open', function () {
+                    console.log("conn open")
+                    connectPeerId.disabled = true
+                    peerIdInput.disabled = true
+                    msgInput.disabled = false
+                    sendMsg.disabled = false
+
+                    conn.on('data', function (data) {
+                        addOutput(data, true)
+                    });
+
+                    sendMsg.addEventListener("click", function () {
+                        addOutput(msgInput.value, false)
+                        conn.send(msgInput.value)
+                        msgInput.value = ""
+                    })
+                });
+            }
+
+            function connect(peerId){
+                connectPeerId.disabled = true
+                peerIdInput.disabled = true
+
+                let conn = peer.connect(peerId)
+                onConnection(conn)
+            }
+
+
+
+            peer.on('open', function (id) {
+                console.log('My peer ID is: ' + id);
+                myPeerId.innerText = 'My peer ID: ' + id
+
+                if (connectTo){
+                    connect(connectTo)
+                }
+
+                copyBtn.disabled = false
+                copyBtn.addEventListener("click", function (){
+                    navigator.clipboard.writeText(id)
+                    copyBtn.innerText = "✓ Copied"
+                })
+            });
+
+            peer.on("connection", function(conn) {
+                onConnection(conn)
+            })
+
+            connectPeerId.addEventListener("click", function () {
+                connect(peerIdInput.value)
+            })
+
+        </script>
+    </body>
+</html>
