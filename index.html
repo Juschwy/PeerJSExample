@@ -90,7 +90,7 @@
                 })
                 shareBtn.disabled = false
                 shareBtn.addEventListener("click", function (){
-                    navigator.clipboard.writeText(location.origin + "?connectTo=" + id)
+                    navigator.clipboard.writeText(location.origin + location.pathname + "?connectTo=" + id)
                     shareBtn.innerText = "✓ Shared"
                 })
             });
