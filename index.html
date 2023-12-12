@@ -12,6 +12,7 @@
         <p>
             <span id="myPeerId">My peer ID: pending...</span>
             <button id="copyBtn" disabled>Copy</button></p>
+            <button id="shareBtn" disabled>Share</button></p>
         <p>
             <label for="peerId">Connect to ID:</label>
             <input id="peerId" type="text">
@@ -29,6 +30,7 @@
             let peer = new Peer();
             const myPeerId = document.getElementById("myPeerId")
             const copyBtn = document.getElementById("copyBtn")
+            const shareBtn = document.getElementById("shareBtn")
             const peerIdInput = document.getElementById("peerId")
             const connectPeerId = document.getElementById("connectPeerIdBtn")
             const msgInput = document.getElementById("msg")
@@ -72,8 +74,6 @@
                 onConnection(conn)
             }
 
-
-
             peer.on('open', function (id) {
                 console.log('My peer ID is: ' + id);
                 myPeerId.innerText = 'My peer ID: ' + id
@@ -86,6 +86,11 @@
                 copyBtn.addEventListener("click", function (){
                     navigator.clipboard.writeText(id)
                     copyBtn.innerText = "✓ Copied"
+                })
+                shareBtn.disabled = false
+                shareBtn.addEventListener("click", function (){
+                    navigator.clipboard.writeText(location.origin + "?connectTo=" + id)
+                    copyBtn.innerText = "✓ Shared"
                 })
             });
 
